@@ -1,85 +1,291 @@
+<div align="center">
+
 # ResearchMind
 
-ResearchMind is an AI-native research workspace for researchers, engineers, and students.
+### AI-native research workspace for discovering, synthesizing, and organizing academic knowledge.
 
-The platform combines:
+<p align="center">
+  <img src="https://img.shields.io/badge/status-in%20development-0f172a?style=for-the-badge" />
+  <img src="https://img.shields.io/badge/frontend-nextjs-000000?style=for-the-badge&logo=nextdotjs" />
+  <img src="https://img.shields.io/badge/backend-fastapi-009688?style=for-the-badge&logo=fastapi" />
+  <img src="https://img.shields.io/badge/agents-langgraph-7C3AED?style=for-the-badge" />
+  <img src="https://img.shields.io/badge/database-supabase-3ECF8E?style=for-the-badge&logo=supabase" />
+</p>
+
+<p align="center">
+  <a href="#features">Features</a>
+  ·
+  <a href="#architecture">Architecture</a>
+  ·
+  <a href="#tech-stack">Tech Stack</a>
+  ·
+  <a href="#roadmap">Roadmap</a>
+</p>
+
+</div>
+
+---
+
+# Overview
+
+ResearchMind is an MCP-native multi-agent research assistant designed for researchers, engineers, students, and R&D teams.
+
+It combines:
 - academic paper discovery,
-- AI synthesis,
-- citation generation,
+- AI-powered synthesis,
+- grounded citations,
 - collections,
-- topic alerts,
 - and research workflows
 
-into a modern, MCP-native system.
+into a modern AI-native workspace.
+
+Instead of manually searching fragmented research databases, users can ask natural language research questions and receive:
+- synthesized insights,
+- related papers,
+- citations,
+- and structured research context.
 
 ---
 
-## Core Features
+# Features
 
-### Search
-- Search across arXiv, Semantic Scholar, PubMed, Crossref
-- Unified ranked results
-- AI-generated synthesis with citations
+## AI Research Search
+- Multi-source academic retrieval
+- arXiv
+- Semantic Scholar
+- PubMed
+- Crossref
+- Unified ranking pipeline
 
-### Paper Detail
-- Abstract
-- Key claims
-- Related work
-- Citation export
-- Ask-about-paper interface
+---
 
-### Collections
+## AI Synthesis
+- Research summaries
+- Grounded citations
+- Key claim extraction
+- Related work discovery
+
+---
+
+## Research Workspace
 - Save papers
-- Organize research
-- Tag/group topics
-
-### Alerts
-- Track research topics
-- Notify users about new papers
+- Collections
+- Topic alerts
+- Research memory
+- Semantic organization
 
 ---
 
-## Tech Stack
+## Modern UX
+- Dark mode first
+- Responsive design
+- Dense but readable layouts
+- AI-native search experience
 
-Frontend:
+---
+
+# Architecture
+
+```txt
+User
+  ↓
+Next.js Frontend
+  ↓
+FastAPI Gateway
+  ↓
+LangGraph Agent Orchestrator
+  ↓
+MCP Tool Layer
+  ├── arXiv
+  ├── Semantic Scholar
+  ├── PubMed
+  ├── Crossref
+  └── Unpaywall
+  ↓
+Storage + Cache Layer
+  ├── Supabase Postgres
+  ├── pgvector
+  ├── Redis
+  └── Cloudflare R2
+```
+
+---
+
+# Tech Stack
+
+## Frontend
+
+<p>
+  <img src="https://skillicons.dev/icons?i=nextjs,react,ts,tailwind" />
+</p>
+
 - Next.js 15
 - React
 - TypeScript
 - Tailwind CSS
 - shadcn/ui
+- Framer Motion
 
-Backend:
+---
+
+## Backend
+
+<p>
+  <img src="https://skillicons.dev/icons?i=python,fastapi,redis,postgres" />
+</p>
+
 - FastAPI
 - LangGraph
-- MCP servers
-
-Infra:
-- Supabase
+- MCP Servers
 - Redis
+- PostgreSQL
+- pgvector
+
+---
+
+## Infrastructure
+
+<p>
+  <img src="https://skillicons.dev/icons?i=vercel,docker,github" />
+</p>
+
 - Vercel
 - Railway
+- Supabase
+- Upstash Redis
+- Cloudflare R2
 
 ---
 
-## Design Philosophy
+# MCP + Agent System
 
-- Modern academic aesthetic
-- Dark mode first
-- Dense but elegant UI
-- Inspired by:
-  - Linear
-  - Perplexity
-  - Notion
-  - Vercel dashboard
+ResearchMind uses a modular MCP-native architecture.
+
+## Agents
+- Search Agent
+- Synthesis Agent
+- Citation Agent
+
+## MCP Tools
+- arXiv Retriever
+- Semantic Scholar Retriever
+- PubMed Retriever
+- DOI Resolver
+- Citation Formatter
 
 ---
 
-## UI Priorities
+# Current Progress
 
-1. Fast search UX
-2. Readability
-3. Clean information density
-4. Strong typography
-5. Reusable components
-6. Mobile responsiveness
-7. Minimal clutter
+## Completed
+- Frontend architecture
+- Dashboard shell
+- Search experience
+- Responsive layouts
+- Design system
+- Dark mode
+- Synthesis UI
+
+## In Progress
+- FastAPI backend
+- MCP integrations
+- Search orchestration
+- API normalization
+
+---
+
+# Local Setup
+
+## Clone Repository
+
+```bash
+git clone https://github.com/YOUR_USERNAME/researchmind.git
+cd researchmind
+```
+
+---
+
+## Install Dependencies
+
+```bash
+npm install
+```
+
+---
+
+## Start Development Server
+
+```bash
+npm run dev
+```
+
+---
+
+# Project Structure
+
+```txt
+app/
+components/
+lib/
+hooks/
+styles/
+types/
+
+components/
+├── layout/
+├── search/
+├── paper/
+├── collections/
+└── ui/
+```
+
+---
+
+# Roadmap
+
+## Phase 1 — MVP
+- Multi-source search
+- AI synthesis
+- Citation generation
+- Collections
+- Alerts
+
+## Phase 2 — Beta
+- Vector search
+- Semantic recommendations
+- User accounts
+- Research memory
+
+## Phase 3 — Growth
+- Team collaboration
+- Private corpora
+- Enterprise connectors
+- Workflow automation
+
+---
+
+# Vision
+
+ResearchMind is evolving toward:
+
+> "Composable AI infrastructure for research workflows."
+
+The long-term goal is to build an extensible research operating system powered by:
+- MCP,
+- multi-agent orchestration,
+- retrieval systems,
+- and research memory.
+
+---
+
+# License
+
+MIT
+
+---
+
+<div align="center">
+
+Built with curiosity, caffeine, and too many research papers.
+
+</div>
