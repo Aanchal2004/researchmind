@@ -1,20 +1,30 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { IBM_Plex_Mono, Manrope, Newsreader } from "next/font/google";
 import "./globals.css";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+const manrope = Manrope({
+  variable: "--font-manrope",
   subsets: ["latin"],
 });
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
+const newsreader = Newsreader({
+  variable: "--font-newsreader",
+  subsets: ["latin"],
+});
+
+const ibmPlexMono = IBM_Plex_Mono({
+  variable: "--font-ibm-plex-mono",
+  weight: ["400", "500"],
   subsets: ["latin"],
 });
 
 export const metadata: Metadata = {
-  title: "ResearchMind",
-  description: "AI-native research workspace",
+  title: {
+    default: "ResearchMind",
+    template: "%s | ResearchMind",
+  },
+  description:
+    "AI-native research workspace for discovering, synthesizing, and organizing academic literature.",
 };
 
 export default function RootLayout({
@@ -27,8 +37,9 @@ export default function RootLayout({
       lang="en"
       className={`
         dark
-        ${geistSans.variable}
-        ${geistMono.variable}
+        ${manrope.variable}
+        ${newsreader.variable}
+        ${ibmPlexMono.variable}
         h-full
         scroll-smooth
       `}
@@ -41,6 +52,7 @@ export default function RootLayout({
           text-zinc-100
           antialiased
           font-sans
+          selection:bg-teal-400/20 selection:text-teal-50
         "
       >
         {children}
