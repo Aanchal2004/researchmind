@@ -2,3 +2,21 @@ node_modules
 .next
 .env
 .vercel
+
+# Python
+.venv/
+__pycache__/
+*.pyc
+
+# Local env variants
+.env.local
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Temporary assets
+ui-mocks/
+
+# Docs
+*.docx

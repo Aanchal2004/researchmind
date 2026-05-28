@@ -1,5 +1,7 @@
 "use client";
 
+import { useEffect, useState } from "react";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { Search, SlidersHorizontal, Sparkles } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -12,6 +14,10 @@ type ResearchSearchBarProps = {
   compact?: boolean;
   showFilters?: boolean;
   className?: string;
+  targetPath?: string;
+  initialValue?: string;
+  onSearch?: (query: string) => void;
+  disabled?: boolean;
 };
 
 export function ResearchSearchBar({
@@ -20,7 +26,42 @@ export function ResearchSearchBar({
   compact = false,
   showFilters = false,
   className,
+  targetPath = "/search",
+  initialValue,
+  onSearch,
+  disabled = false,
 }: ResearchSearchBarProps) {
+  const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+  const queryFromUrl = searchParams.get("q") ?? "";
+  const [query, setQuery] = useState(initialValue ?? queryFromUrl);
+
+  useEffect(() => {
+    setQuery(initialValue ?? queryFromUrl);
+  }, [initialValue, queryFromUrl]);
+
+  function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    const normalizedQuery = query.trim().replace(/\s+/g, " ");
+    if (!normalizedQuery) {
+      return;
+    }
+
+    if (onSearch) {
+      onSearch(normalizedQuery);
+      return;
+    }
+
+    const params = new URLSearchParams(searchParams.toString());
+    params.set("q", normalizedQuery);
+    if (!params.get("limit")) {
+      params.set("limit", "8");
+    }
+    const nextPath = pathname === targetPath ? pathname : targetPath;
+    router.push(`${nextPath}?${params.toString()}`);
+  }
+
   return (
     <form
       role="search"
@@ -29,7 +70,7 @@ export function ResearchSearchBar({
         compact ? "rounded-xl p-1.5" : "p-2.5",
         className,
       )}
-      onSubmit={(event) => event.preventDefault()}
+      onSubmit={handleSubmit}
     >
       <label htmlFor="research-search" className="sr-only">
         Search academic literature
@@ -39,7 +80,10 @@ export function ResearchSearchBar({
         <Input
           id="research-search"
           type="search"
+          value={query}
+          onChange={(event) => setQuery(event.target.value)}
           placeholder={placeholder}
+          disabled={disabled}
           className={cn(
             "h-12 border-0 bg-transparent px-0 text-sm text-slate-50 shadow-none ring-0 placeholder:text-slate-500 focus-visible:ring-0 md:text-sm",
             compact && "h-10 text-[0.95rem]",
@@ -63,6 +107,7 @@ export function ResearchSearchBar({
       <Button
         type="submit"
         size={compact ? "sm" : "lg"}
+        disabled={disabled}
         className={cn(
           "rounded-xl bg-[linear-gradient(135deg,#14b8c8_0%,#1b88a4_100%)] px-4 text-sm font-semibold text-slate-950 hover:brightness-110",
           compact && "h-10 px-3",

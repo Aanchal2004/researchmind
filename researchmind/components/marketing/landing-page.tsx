@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import Link from "next/link";
 import {
   ArrowRight,
@@ -76,11 +77,13 @@ export function LandingPage() {
             </p>
 
             <div className="mx-auto mt-10 max-w-4xl">
-              <ResearchSearchBar
-                placeholder="Ask anything or search the literature..."
-                buttonLabel="Start searching"
-                className="bg-white/[0.03]"
-              />
+              <Suspense fallback={<div className="h-16 rounded-[1.35rem] bg-white/[0.03]" />}>
+                <ResearchSearchBar
+                  placeholder="Ask anything or search the literature..."
+                  buttonLabel="Start searching"
+                  className="bg-white/[0.03]"
+                />
+              </Suspense>
             </div>
 
             <div id="databases" className="mt-10">

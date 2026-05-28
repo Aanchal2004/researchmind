@@ -1,5 +1,6 @@
 "use client";
 
+import { Suspense } from "react";
 import Link from "next/link";
 import { Bell, Bookmark, Menu } from "lucide-react";
 
@@ -47,10 +48,12 @@ export function WorkspaceHeader() {
         </div>
 
         <div className="min-w-0 flex-1">
-          <ResearchSearchBar
-            compact
-            className="border-0 bg-transparent p-0 shadow-none"
-          />
+          <Suspense fallback={<div className="h-10 rounded-xl bg-white/5" />}>
+            <ResearchSearchBar
+              compact
+              className="border-0 bg-transparent p-0 shadow-none"
+            />
+          </Suspense>
         </div>
 
         <div className="hidden items-center gap-2 md:flex">
