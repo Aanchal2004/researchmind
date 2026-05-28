@@ -1,6 +1,6 @@
 <div align="center">
 
-# ResearchMind
+# 🔬 ResearchMind
 
 ### AI-native research workspace for discovering, synthesizing, and organizing academic knowledge.
 
@@ -13,80 +13,82 @@
 </p>
 
 <p align="center">
-  <a href="#features">Features</a>
-  ·
-  <a href="#architecture">Architecture</a>
-  ·
-  <a href="#tech-stack">Tech Stack</a>
-  ·
-  <a href="#roadmap">Roadmap</a>
+  <a href="#-overview">Overview</a> ·
+  <a href="#-features">Features</a> ·
+  <a href="#-architecture">Architecture</a> ·
+  <a href="#-tech-stack">Tech Stack</a> ·
+  <a href="#-current-progress">Progress</a> ·
+  <a href="#-roadmap">Roadmap</a>
 </p>
 
 </div>
 
 ---
 
-# Overview
+## 📖 Overview
 
-ResearchMind is an MCP-native multi-agent research assistant designed for researchers, engineers, students, and R&D teams.
+ResearchMind is an **MCP-native multi-agent research assistant** designed for researchers, engineers, students, and R&D teams.
 
-It combines:
-- academic paper discovery,
-- AI-powered synthesis,
-- grounded citations,
-- collections,
-- and research workflows
-
-into a modern AI-native workspace.
+It combines academic paper discovery, AI-powered synthesis, grounded citations, collections, and research workflows into a modern AI-native workspace.
 
 Instead of manually searching fragmented research databases, users can ask natural language research questions and receive:
-- synthesized insights,
-- related papers,
-- citations,
-- and structured research context.
+
+- 🔍 Synthesized insights
+- 📄 Related papers
+- 🔗 Citations
+- 🗂️ Structured research context
 
 ---
 
-# Features
+## ✨ Features
 
-## AI Research Search
+<table>
+<tr>
+<td width="50%">
+
+### 🔍 AI Research Search
 - Multi-source academic retrieval
-- arXiv
-- Semantic Scholar
-- PubMed
-- Crossref
+- arXiv, Semantic Scholar, PubMed, Crossref
 - Unified ranking pipeline
 
----
+</td>
+<td width="50%">
 
-## AI Synthesis
+### 🧠 AI Synthesis
 - Research summaries
 - Grounded citations
 - Key claim extraction
 - Related work discovery
 
----
+</td>
+</tr>
+<tr>
+<td width="50%">
 
-## Research Workspace
-- Save papers
-- Collections
+### 🗂️ Research Workspace
+- Save papers & collections
 - Topic alerts
 - Research memory
 - Semantic organization
 
----
+</td>
+<td width="50%">
 
-## Modern UX
+### 🎨 Modern UX
 - Dark mode first
 - Responsive design
 - Dense but readable layouts
 - AI-native search experience
 
+</td>
+</tr>
+</table>
+
 ---
 
-# Architecture
+## 🏗️ Architecture
 
-```txt
+```
 User
   ↓
 Next.js Frontend
@@ -111,174 +113,182 @@ Storage + Cache Layer
 
 ---
 
-# Tech Stack
+## 🛠️ Tech Stack
 
-## Frontend
-
+### Frontend
 <p>
   <img src="https://skillicons.dev/icons?i=nextjs,react,ts,tailwind" />
 </p>
 
-- Next.js 15
-- React
-- TypeScript
-- Tailwind CSS
-- shadcn/ui
-- Framer Motion
+`Next.js 15` · `React` · `TypeScript` · `Tailwind CSS` · `shadcn/ui` · `Framer Motion`
 
----
-
-## Backend
-
+### Backend
 <p>
   <img src="https://skillicons.dev/icons?i=python,fastapi,redis,postgres" />
 </p>
 
-- FastAPI
-- LangGraph
-- MCP Servers
-- Redis
-- PostgreSQL
-- pgvector
+`FastAPI` · `LangGraph` · `MCP Servers` · `Redis` · `PostgreSQL` · `pgvector`
 
----
-
-## Infrastructure
-
+### Infrastructure
 <p>
   <img src="https://skillicons.dev/icons?i=vercel,docker,github" />
 </p>
 
-- Vercel
-- Railway
-- Supabase
-- Upstash Redis
-- Cloudflare R2
+`Vercel` · `Railway` · `Supabase` · `Upstash Redis` · `Cloudflare R2`
 
 ---
 
-# MCP + Agent System
+## 🤖 MCP + Agent System
 
 ResearchMind uses a modular MCP-native architecture.
 
-## Agents
-- Search Agent
-- Synthesis Agent
-- Citation Agent
-
-## MCP Tools
-- arXiv Retriever
-- Semantic Scholar Retriever
-- PubMed Retriever
-- DOI Resolver
-- Citation Formatter
+| Layer | Components |
+|-------|------------|
+| **Agents** | Search Agent · Synthesis Agent · Citation Agent |
+| **MCP Tools** | arXiv Retriever · Semantic Scholar Retriever · PubMed Retriever · DOI Resolver · Citation Formatter |
 
 ---
 
-# Current Progress
+## 📊 Current Progress
 
-## Completed
-- Frontend architecture
-- Dashboard shell
-- Search experience
-- Responsive layouts
-- Design system
-- Dark mode
-- Synthesis UI
+### Core Platform
 
-## In Progress
-- FastAPI backend
-- MCP integrations
-- Search orchestration
-- API normalization
+| Module | Status | Notes |
+|--------|--------|-------|
+| Frontend Architecture | ✅ Complete | App structure, routing, layouts |
+| Design System | ✅ Complete | shadcn/ui + Tailwind integration |
+| Responsive Workspace UI | ✅ Complete | Desktop-first responsive flows |
+| Search Experience | ✅ Complete | AI-native search UX |
+| Synthesis Panel UI | ✅ Complete | Multi-panel synthesis layout |
+| API Contracts | ✅ Complete | Typed request/response schemas |
+| FastAPI Backend | 🟡 In Progress | API gateway + orchestration |
+| Search Aggregation | 🟡 In Progress | Multi-source normalization |
+| MCP Integration Layer | 🟡 In Progress | Tool orchestration |
+| LangGraph Agents | 🟡 In Progress | Agent workflows |
+| Citation Pipeline | 🔲 Planned | Structured grounding |
+| Collections System | 🔲 Planned | Persistent organization |
+| Research Memory | 🔲 Planned | Long-term semantic context |
+
+### Retrieval Integrations
+
+| Source | Status |
+|--------|--------|
+| arXiv | 🟡 In Progress |
+| Semantic Scholar | 🟡 In Progress |
+| PubMed | 🔲 Planned |
+| Crossref | 🔲 Planned |
+| Unpaywall | 🔲 Planned |
+
+### Infrastructure
+
+| Component | Status |
+|-----------|--------|
+| Vercel Deployment | ✅ Configured |
+| Docker Support | 🟡 In Progress |
+| Supabase Postgres | 🔲 Planned |
+| pgvector | 🔲 Planned |
+| Redis Cache | 🔲 Planned |
+| Cloudflare R2 | 🔲 Planned |
 
 ---
 
-# Local Setup
+## 🗺️ Upcoming Milestones
 
-## Clone Repository
+<details>
+<summary><b>Milestone 1 — Search Pipeline</b></summary>
+
+- [ ] Unified retrieval orchestration
+- [ ] Result normalization
+- [ ] Ranking pipeline
+- [ ] API response contracts
+
+</details>
+
+<details>
+<summary><b>Milestone 2 — AI Synthesis</b></summary>
+
+- [ ] Grounded summaries
+- [ ] Citation extraction
+- [ ] Key insight generation
+- [ ] Related paper linking
+
+</details>
+
+<details>
+<summary><b>Milestone 3 — Research Workspace</b></summary>
+
+- [ ] Collections
+- [ ] Saved papers
+- [ ] Topic tracking
+- [ ] Research memory
+
+</details>
+
+---
+
+## 🎯 Engineering Goals
+
+- Modular MCP-native architecture
+- Production-oriented backend structure
+- Retrieval-first AI workflows
+- Extensible multi-agent orchestration
+- Scalable research infrastructure
+
+---
+
+## 🚀 Local Setup
 
 ```bash
-git clone https://github.com/YOUR_USERNAME/researchmind.git
+# Clone the repository
+git clone https://github.com/Aanchal2004/researchmind.git
 cd researchmind
-```
 
----
-
-## Install Dependencies
-
-```bash
+# Install dependencies
 npm install
-```
 
----
-
-## Start Development Server
-
-```bash
+# Start development server
 npm run dev
 ```
 
 ---
 
-# Project Structure
+## 📁 Project Structure
 
-```txt
+```
 app/
 components/
+  ├── layout/
+  ├── search/
+  ├── paper/
+  ├── collections/
+  └── ui/
 lib/
 hooks/
 styles/
 types/
-
-components/
-├── layout/
-├── search/
-├── paper/
-├── collections/
-└── ui/
 ```
 
 ---
 
-# Roadmap
+## 🔭 Roadmap
 
-## Phase 1 — MVP
-- Multi-source search
-- AI synthesis
-- Citation generation
-- Collections
-- Alerts
-
-## Phase 2 — Beta
-- Vector search
-- Semantic recommendations
-- User accounts
-- Research memory
-
-## Phase 3 — Growth
-- Team collaboration
-- Private corpora
-- Enterprise connectors
-- Workflow automation
+| Phase | Focus | Highlights |
+|-------|-------|------------|
+| **Phase 1 — MVP** | Core functionality | Multi-source search, AI synthesis, citations, collections, alerts |
+| **Phase 2 — Beta** | Intelligence | Vector search, semantic recommendations, user accounts, research memory |
+| **Phase 3 — Growth** | Scale | Team collaboration, private corpora, enterprise connectors, workflow automation |
 
 ---
 
-# Vision
+## 💡 Vision
 
-ResearchMind is evolving toward:
+> **"Composable AI infrastructure for research workflows."**
 
-> "Composable AI infrastructure for research workflows."
-
-The long-term goal is to build an extensible research operating system powered by:
-- MCP,
-- multi-agent orchestration,
-- retrieval systems,
-- and research memory.
+The long-term goal is to build an extensible research operating system powered by MCP, multi-agent orchestration, retrieval systems, and research memory.
 
 ---
 
-# License
+## 📄 License
 
 MIT
 
@@ -286,6 +296,6 @@ MIT
 
 <div align="center">
 
-Built with curiosity, caffeine, and too many research papers.
+*Built with curiosity, caffeine, and too many research papers.*
 
 </div>
