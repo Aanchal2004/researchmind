@@ -279,6 +279,30 @@ types/
 | **Phase 3 — Growth** | Scale | Team collaboration, private corpora, enterprise connectors, workflow automation |
 
 ---
+# Contributing
+
+Contributions, improvements, and architecture discussions are welcome.
+
+If you'd like to work on an issue:
+
+1. Browse the open issues
+2. Comment on the issue you'd like to take
+3. Wait for assignment/discussion if needed
+4. Fork the repository
+5. Create a feature branch
+6. Submit a pull request with a clear description
+
+---
+
+## Development Guidelines
+
+- Keep architecture modular
+- Prefer small focused PRs
+- Maintain TypeScript/Python typing
+- Preserve existing design language
+- Avoid unnecessary abstractions
+- Add comments for non-obvious logic
+- Keep retrieval/provider logic isolated
 
 ## 💡 Vision
 
