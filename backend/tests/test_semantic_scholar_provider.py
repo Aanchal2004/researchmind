@@ -39,7 +39,9 @@ async def test_semantic_scholar_provider_normalizes_search_response() -> None:
             max_results_per_request=10,
             retry_attempts=1,
             retry_backoff_seconds=0.0,
+            retry_jitter_seconds=0.0,
             request_timeout_seconds=5.0,
+            total_budget_seconds=5.0,
             min_interval_seconds=0.0,
         )
 
@@ -59,12 +61,18 @@ async def test_semantic_scholar_provider_normalizes_search_response() -> None:
 
 @pytest.mark.asyncio
 async def test_semantic_scholar_provider_reports_rate_limit_errors() -> None:
-    transport = httpx.MockTransport(
-        lambda _: httpx.Response(
+    requests: list[httpx.Request] = []
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        requests.append(request)
+        return httpx.Response(
             429,
             json={"message": "Too Many Requests", "code": "429"},
             headers={"Retry-After": "0"},
         )
+
+    transport = httpx.MockTransport(
+        handler
     )
     async with httpx.AsyncClient(transport=transport) as client:
         provider = SemanticScholarSearchProvider(
@@ -72,9 +80,11 @@ async def test_semantic_scholar_provider_reports_rate_limit_errors() -> None:
             base_url="https://api.semanticscholar.org/graph/v1/paper/search",
             api_key=None,
             max_results_per_request=10,
-            retry_attempts=1,
+            retry_attempts=3,
             retry_backoff_seconds=0.0,
+            retry_jitter_seconds=0.0,
             request_timeout_seconds=5.0,
+            total_budget_seconds=5.0,
             min_interval_seconds=0.0,
         )
 
@@ -82,5 +92,7 @@ async def test_semantic_scholar_provider_reports_rate_limit_errors() -> None:
 
     assert result.items == []
     assert result.report.status == "error"
-    assert result.report.errors[0].code == "http_status_error"
+    assert result.report.errors[0].code == "rate_limited"
+    assert result.report.errors[0].retryable is False
     assert "API key" in result.report.errors[0].message
+    assert len(requests) == 1

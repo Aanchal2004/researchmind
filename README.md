@@ -153,173 +153,106 @@ ResearchMind uses a modular MCP-native architecture.
 
 ### Core Platform
 
-| Module | Status | Notes |
-|--------|--------|-------|
-| Frontend Architecture | ✅ Complete | App structure, routing, layouts |
-| Design System | ✅ Complete | shadcn/ui + Tailwind integration |
-| Responsive Workspace UI | ✅ Complete | Desktop-first responsive flows |
-| Search Experience | ✅ Complete | AI-native search UX |
-| Synthesis Panel UI | ✅ Complete | Multi-panel synthesis layout |
-| API Contracts | ✅ Complete | Typed request/response schemas |
-| FastAPI Backend | 🟡 In Progress | API gateway + orchestration |
-| Search Aggregation | 🟡 In Progress | Multi-source normalization |
-| MCP Integration Layer | 🟡 In Progress | Tool orchestration |
-| LangGraph Agents | 🟡 In Progress | Agent workflows |
-| Citation Pipeline | 🔲 Planned | Structured grounding |
-| Collections System | 🔲 Planned | Persistent organization |
-| Research Memory | 🔲 Planned | Long-term semantic context |
+| Module                  | Status         | Notes                                           |
+| ----------------------- | -------------- | ----------------------------------------------- |
+| Frontend Architecture   | ✅ Complete     | App structure, routing, layouts                 |
+| Design System           | ✅ Complete     | shadcn/ui + Tailwind integration                |
+| Responsive Workspace UI | ✅ Complete     | Desktop + mobile responsive flows               |
+| Search Experience       | ✅ Complete     | Live AI-native search UX                        |
+| Synthesis Panel UI      | ✅ Complete     | Grounded synthesis + citations                  |
+| API Contracts           | ✅ Complete     | Typed request/response schemas                  |
+| FastAPI Backend         | ✅ Complete     | Async backend foundation                        |
+| Search Aggregation      | ✅ Complete     | Multi-provider normalization + merge            |
+| Retrieval Hardening     | ✅ Complete     | Retry/backoff, caching, circuit breaker         |
+| Deterministic Ranking   | ✅ Complete     | Explainable ranking heuristics                  |
+| Deduplication Layer     | ✅ Complete     | DOI + fuzzy-title dedupe                        |
+| Grounded Synthesis      | ✅ Complete     | Deterministic extractive synthesis              |
+| Provider Diagnostics    | ✅ Complete     | Graceful degraded retrieval states              |
+| MCP Integration Layer   | 🟡 In Progress | Architecture prepared, partial integration      |
+| LangGraph Agents        | 🔲 Planned     | Deferred intentionally until workflows mature   |
+| Citation Pipeline       | 🟡 In Progress | Grounded citations integrated into synthesis UX |
+| Collections System      | 🔲 Planned     | Saved papers + organization workflows           |
+| Research Memory         | 🔲 Planned     | Long-term semantic context                      |
 
 ### Retrieval Integrations
 
-| Source | Status |
-|--------|--------|
-| arXiv | 🟡 In Progress |
-| Semantic Scholar | 🟡 In Progress |
-| PubMed | 🔲 Planned |
-| Crossref | 🔲 Planned |
-| Unpaywall | 🔲 Planned |
+| Source           | Status     |
+| ---------------- | ---------- |
+| arXiv            | ✅ Complete |
+| Semantic Scholar | ✅ Complete |
+| PubMed           | 🔲 Planned |
+| Crossref         | 🔲 Planned |
+| Unpaywall        | 🔲 Planned |
 
 ### Infrastructure
 
-| Component | Status |
-|-----------|--------|
-| Vercel Deployment | ✅ Configured |
-| Docker Support | 🟡 In Progress |
-| Supabase Postgres | 🔲 Planned |
-| pgvector | 🔲 Planned |
-| Redis Cache | 🔲 Planned |
-| Cloudflare R2 | 🔲 Planned |
+| Component         | Status         |
+| ----------------- | -------------- |
+| Vercel Deployment | ✅ Configured   |
+| Docker Support    | 🟡 In Progress |
+| Supabase Postgres | 🔲 Planned     |
+| pgvector          | 🔲 Planned     |
+| Redis Cache       | 🔲 Planned     |
+| Cloudflare R2     | 🔲 Planned     |
 
 ---
 
 ## 🗺️ Upcoming Milestones
 
 <details>
-<summary><b>Milestone 1 — Search Pipeline</b></summary>
+<summary><b>Milestone 1 — Retrieval + Synthesis MVP</b></summary>
 
-- [ ] Unified retrieval orchestration
-- [ ] Result normalization
-- [ ] Ranking pipeline
-- [ ] API response contracts
-
-</details>
-
-<details>
-<summary><b>Milestone 2 — AI Synthesis</b></summary>
-
-- [ ] Grounded summaries
-- [ ] Citation extraction
-- [ ] Key insight generation
-- [ ] Related paper linking
+* [x] Unified retrieval orchestration
+* [x] Result normalization
+* [x] Deterministic ranking pipeline
+* [x] DOI + fuzzy-title deduplication
+* [x] Grounded synthesis generation
+* [x] Provider diagnostics
+* [x] Responsive synthesis UX
 
 </details>
 
 <details>
-<summary><b>Milestone 3 — Research Workspace</b></summary>
+<summary><b>Milestone 2 — Research Workspace</b></summary>
 
-- [ ] Collections
-- [ ] Saved papers
-- [ ] Topic tracking
-- [ ] Research memory
+* [ ] Saved papers
+* [ ] Collections
+* [ ] Search persistence
+* [ ] Citation export
+* [ ] Paper detail pages
 
 </details>
 
----
+<details>
+<summary><b>Milestone 3 — Retrieval Intelligence</b></summary>
 
-## 🎯 Engineering Goals
+* [ ] PubMed integration
+* [ ] Crossref integration
+* [ ] Unpaywall integration
+* [ ] Retrieval quality tuning
+* [ ] Query expansion strategies
 
-- Modular MCP-native architecture
-- Production-oriented backend structure
-- Retrieval-first AI workflows
-- Extensible multi-agent orchestration
-- Scalable research infrastructure
+</details>
 
----
+<details>
+<summary><b>Milestone 4 — Research Memory + Agents</b></summary>
 
-## 🚀 Local Setup
+* [ ] Vector search
+* [ ] Semantic recommendations
+* [ ] Long-term research memory
+* [ ] Workflow orchestration
+* [ ] LangGraph agent systems
 
-```bash
-# Clone the repository
-git clone https://github.com/Aanchal2004/researchmind.git
-cd researchmind
-
-# Install dependencies
-npm install
-
-# Start development server
-npm run dev
-```
-
----
-
-## 📁 Project Structure
-
-```
-app/
-components/
-  ├── layout/
-  ├── search/
-  ├── paper/
-  ├── collections/
-  └── ui/
-lib/
-hooks/
-styles/
-types/
-```
+</details>
 
 ---
 
 ## 🔭 Roadmap
 
-| Phase | Focus | Highlights |
-|-------|-------|------------|
-| **Phase 1 — MVP** | Core functionality | Multi-source search, AI synthesis, citations, collections, alerts |
-| **Phase 2 — Beta** | Intelligence | Vector search, semantic recommendations, user accounts, research memory |
-| **Phase 3 — Growth** | Scale | Team collaboration, private corpora, enterprise connectors, workflow automation |
-
----
-# Contributing
-
-Contributions, improvements, and architecture discussions are welcome.
-
-If you'd like to work on an issue:
-
-1. Browse the open issues
-2. Comment on the issue you'd like to take
-3. Wait for assignment/discussion if needed
-4. Fork the repository
-5. Create a feature branch
-6. Submit a pull request with a clear description
-
----
-
-## Development Guidelines
-
-- Keep architecture modular
-- Prefer small focused PRs
-- Maintain TypeScript/Python typing
-- Preserve existing design language
-- Avoid unnecessary abstractions
-- Add comments for non-obvious logic
-- Keep retrieval/provider logic isolated
-
-## 💡 Vision
-
-> **"Composable AI infrastructure for research workflows."**
-
-The long-term goal is to build an extensible research operating system powered by MCP, multi-agent orchestration, retrieval systems, and research memory.
-
----
-
-## 📄 License
-
-MIT
-
----
-
-<div align="center">
-
-*Built with curiosity, caffeine, and too many research papers.*
-
-</div>
+| Phase                                | Focus                         | Highlights                                                        |
+| ------------------------------------ | ----------------------------- | ----------------------------------------------------------------- |
+| **Phase 1 — Retrieval MVP**          | Core retrieval infrastructure | Multi-provider search, ranking, deduplication, grounded synthesis |
+| **Phase 2 — Research Workspace**     | User workflow UX              | Saved papers, collections, citation export, search persistence    |
+| **Phase 3 — Retrieval Intelligence** | Search quality expansion      | Additional providers, retrieval tuning, semantic relevance        |
+| **Phase 4 — Research Memory**        | Long-term context             | Vector search, semantic memory, related-paper intelligence        |
+| **Phase 5 — Agent Workflows**        | Orchestration                 | LangGraph workflows, research automation, agent pipelines         |

@@ -7,6 +7,7 @@ export type SearchFilters = {
 
 export type SearchRequest = {
   query: string;
+  page?: number;
   limit: number;
   filters: SearchFilters;
 };
@@ -25,16 +26,23 @@ export type SearchResultItem = {
   pdf_url?: string | null;
   open_access: boolean;
   tags: string[];
+  provider_sources: string[];
+  provider_ids: string[];
 };
 
 export type SearchSynthesis = {
-  status: "pending" | "completed";
+  status: "pending" | "completed" | "disabled" | "failed";
   summary: string;
   highlights: string[];
   sources: string[];
 };
 
 export type SearchMeta = {
+  provider_reports: ProviderReport[];
+  page: number;
+  limit: number;
+  total_results?: number | null;
+  next_page?: number | null;
   query_id: string;
   mode: "scaffold" | "live";
   result_count: number;
@@ -49,4 +57,24 @@ export type SearchResponse = {
   results: SearchResultItem[];
   synthesis: SearchSynthesis;
   meta: SearchMeta;
+};
+
+export type ProviderError = {
+  code: string;
+  message: string;
+  retryable: boolean;
+  attempt?: number | null;
+};
+
+export type ProviderReport = {
+  source: string;
+  status: "ok" | "partial" | "error";
+  query_strategy: string;
+  page: number;
+  requested_limit: number;
+  served_count: number;
+  total_results?: number | null;
+  next_page?: number | null;
+  latency_ms: number;
+  errors: ProviderError[];
 };

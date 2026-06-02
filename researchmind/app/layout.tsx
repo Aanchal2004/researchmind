@@ -1,22 +1,5 @@
 import type { Metadata } from "next";
-import { IBM_Plex_Mono, Manrope, Newsreader } from "next/font/google";
 import "./globals.css";
-
-const manrope = Manrope({
-  variable: "--font-manrope",
-  subsets: ["latin"],
-});
-
-const newsreader = Newsreader({
-  variable: "--font-newsreader",
-  subsets: ["latin"],
-});
-
-const ibmPlexMono = IBM_Plex_Mono({
-  variable: "--font-ibm-plex-mono",
-  weight: ["400", "500"],
-  subsets: ["latin"],
-});
 
 export const metadata: Metadata = {
   title: {
@@ -33,18 +16,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html
-      lang="en"
-      className={`
-        dark
-        ${manrope.variable}
-        ${newsreader.variable}
-        ${ibmPlexMono.variable}
-        h-full
-        scroll-smooth
-      `}
-      suppressHydrationWarning
-    >
+    <html lang="en" className="dark h-full scroll-smooth" suppressHydrationWarning>
       <body
         className="
           min-h-screen

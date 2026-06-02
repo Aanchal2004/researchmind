@@ -10,6 +10,7 @@ from app.providers.search.base import SearchProvider
 from app.providers.search.semantic_scholar import SemanticScholarSearchProvider
 from app.providers.search.stub import StubSearchProvider
 from app.services.search import SearchService
+from app.services.synthesis import SynthesisService
 
 
 @dataclass(slots=True)
@@ -62,7 +63,9 @@ def build_container(settings: Settings) -> ApplicationContainer:
                 max_results_per_request=settings.semantic_scholar_max_results_per_request,
                 retry_attempts=settings.semantic_scholar_retry_attempts,
                 retry_backoff_seconds=settings.semantic_scholar_retry_backoff_seconds,
+                retry_jitter_seconds=settings.semantic_scholar_retry_jitter_seconds,
                 request_timeout_seconds=settings.semantic_scholar_request_timeout_seconds,
+                total_budget_seconds=settings.semantic_scholar_total_budget_seconds,
                 min_interval_seconds=settings.semantic_scholar_min_interval_seconds,
             )
         )
@@ -73,6 +76,11 @@ def build_container(settings: Settings) -> ApplicationContainer:
         providers=providers,
         default_limit=settings.search_default_limit,
         max_limit=settings.search_max_limit,
+        synthesis_service=SynthesisService(
+            enabled=settings.synthesis_enabled,
+            max_papers=settings.synthesis_max_papers,
+            max_abstract_chars=settings.synthesis_max_abstract_chars,
+        ),
     )
 
     return ApplicationContainer(

@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import asyncio
 import logging
+import random
 from time import monotonic, perf_counter
 
 import httpx
@@ -40,7 +41,9 @@ class SemanticScholarSearchProvider:
         max_results_per_request: int,
         retry_attempts: int,
         retry_backoff_seconds: float,
+        retry_jitter_seconds: float,
         request_timeout_seconds: float,
+        total_budget_seconds: float,
         min_interval_seconds: float,
     ) -> None:
         self.http_client = http_client
@@ -49,7 +52,9 @@ class SemanticScholarSearchProvider:
         self.max_results_per_request = max_results_per_request
         self.retry_attempts = max(1, retry_attempts)
         self.retry_backoff_seconds = max(0.0, retry_backoff_seconds)
+        self.retry_jitter_seconds = max(0.0, retry_jitter_seconds)
         self.request_timeout_seconds = request_timeout_seconds
+        self.total_budget_seconds = total_budget_seconds
         self.min_interval_seconds = max(0.0, min_interval_seconds)
         self.logger = logging.getLogger("researchmind.providers.semantic_scholar")
         self._rate_limit_lock = asyncio.Lock()
@@ -60,11 +65,26 @@ class SemanticScholarSearchProvider:
         requested_limit = min(payload.limit, self.max_results_per_request)
         offset = max(0, (payload.page - 1) * requested_limit)
 
-        response_payload, errors = await self._fetch_with_retries(
-            query=self._normalize_query(payload.query),
-            limit=requested_limit,
-            offset=offset,
-        )
+        try:
+            async with asyncio.timeout(self.total_budget_seconds):
+                response_payload, errors = await self._fetch_with_retries(
+                    query=self._normalize_query(payload.query),
+                    limit=requested_limit,
+                    offset=offset,
+                )
+        except TimeoutError:
+            response_payload = None
+            errors = [
+                ProviderError(
+                    code="budget_exceeded",
+                    message="Semantic Scholar provider exceeded the total request budget.",
+                    retryable=True,
+                )
+            ]
+            self.logger.warning(
+                "Semantic Scholar provider budget exceeded",
+                extra={"page": payload.page, "limit": requested_limit},
+            )
 
         items: list[SearchResultItem] = []
         total_results = None
@@ -149,14 +169,15 @@ class SemanticScholarSearchProvider:
             except httpx.HTTPStatusError as exc:
                 status_code = exc.response.status_code
                 retry_after = exc.response.headers.get("Retry-After")
-                retryable = status_code in {408, 409, 425, 429} or status_code >= 500
+                retryable = status_code in {408, 409, 425} or status_code >= 500
+                error_code = "rate_limited" if status_code == 429 else "http_status_error"
                 message = f"Semantic Scholar returned HTTP {status_code}."
                 if status_code == 429 and not self.api_key:
                     message += " Add a Semantic Scholar API key for higher rate limits."
 
                 errors.append(
                     ProviderError(
-                        code="http_status_error",
+                        code=error_code,
                         message=message,
                         retryable=retryable and attempt < self.retry_attempts,
                         attempt=attempt,
@@ -168,6 +189,8 @@ class SemanticScholarSearchProvider:
                     extra={"attempt": attempt, "retry_after": retry_after},
                 )
 
+                if status_code == 429:
+                    break
                 if retryable and attempt < self.retry_attempts:
                     await asyncio.sleep(self._resolve_retry_delay(attempt, retry_after))
                     continue
@@ -195,7 +218,7 @@ class SemanticScholarSearchProvider:
                 break
 
             if attempt < self.retry_attempts:
-                await asyncio.sleep(self.retry_backoff_seconds * attempt)
+                await asyncio.sleep(self._resolve_retry_delay(attempt, None))
 
         return None, errors
 
@@ -211,8 +234,10 @@ class SemanticScholarSearchProvider:
             try:
                 return max(float(retry_after), self.retry_backoff_seconds)
             except ValueError:
-                return self.retry_backoff_seconds * attempt
-        return self.retry_backoff_seconds * attempt
+                pass
+
+        base_delay = self.retry_backoff_seconds * (2 ** (attempt - 1))
+        return base_delay + random.uniform(0, self.retry_jitter_seconds)
 
     def _normalize_paper(self, paper: SemanticScholarPaper) -> SearchResultItem:
         doi = paper.externalIds.DOI if paper.externalIds else None

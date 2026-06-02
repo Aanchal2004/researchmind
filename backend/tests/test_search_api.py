@@ -25,3 +25,6 @@ def test_search_api_works_with_stub_provider() -> None:
     assert payload["meta"]["page"] == 1
     assert payload["meta"]["provider_reports"][0]["source"] == "stub"
     assert payload["results"][0]["paper_id"] == "stub-targetdiff"
+    assert payload["synthesis"]["status"] == "completed"
+    assert payload["synthesis"]["sources"] == ["stub-targetdiff"]
+    assert "[1]" in payload["synthesis"]["summary"]

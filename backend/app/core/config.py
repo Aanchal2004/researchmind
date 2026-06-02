@@ -16,6 +16,8 @@ class Settings(BaseSettings):
         default_factory=lambda: [
             "http://localhost:3000",
             "http://127.0.0.1:3000",
+            "http://localhost:3001",
+            "http://127.0.0.1:3001",
         ]
     )
     log_level: str = "INFO"
@@ -44,8 +46,13 @@ class Settings(BaseSettings):
     semantic_scholar_max_results_per_request: int = 10
     semantic_scholar_retry_attempts: int = 2
     semantic_scholar_retry_backoff_seconds: float = 1.5
+    semantic_scholar_retry_jitter_seconds: float = 0.5
     semantic_scholar_request_timeout_seconds: float = 12.0
+    semantic_scholar_total_budget_seconds: float = 12.0
     semantic_scholar_min_interval_seconds: float = 1.1
+    synthesis_enabled: bool = True
+    synthesis_max_papers: int = 5
+    synthesis_max_abstract_chars: int = 1200
     http_timeout_seconds: float = 10.0
 
     model_config = SettingsConfigDict(

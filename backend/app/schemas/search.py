@@ -42,10 +42,12 @@ class SearchResultItem(BaseModel):
     pdf_url: str | None = None
     open_access: bool = False
     tags: list[str] = Field(default_factory=list)
+    provider_sources: list[str] = Field(default_factory=list)
+    provider_ids: list[str] = Field(default_factory=list)
 
 
 class SearchSynthesis(BaseModel):
-    status: Literal["pending", "completed"]
+    status: Literal["pending", "completed", "disabled", "failed"]
     summary: str
     highlights: list[str] = Field(default_factory=list)
     sources: list[str] = Field(default_factory=list)

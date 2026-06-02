@@ -1,15 +1,37 @@
-import { ArrowUpRight, Bookmark, ExternalLink } from "lucide-react";
+import {
+  AlertTriangle,
+  ArrowUpRight,
+  Bookmark,
+  Clock,
+  ExternalLink,
+  Gauge,
+  RefreshCw,
+} from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
-import type { SearchResponse, SearchResultItem } from "@/lib/api/types";
+import type {
+  ProviderError,
+  ProviderReport,
+  SearchResponse,
+  SearchResultItem,
+} from "@/lib/api/types";
 
 type SearchResultsPanelProps = {
   data: SearchResponse | null;
   isLoading: boolean;
   errorMessage: string | null;
   onRetry: () => void;
+};
+
+type RetrievalDiagnostic = {
+  severity: "ok" | "partial" | "error";
+  title: string;
+  body: string;
+  label: string;
+  retryable: boolean;
+  icon: "health" | "timeout" | "rate_limit";
 };
 
 export function SearchResultsPanel({
@@ -20,13 +42,18 @@ export function SearchResultsPanel({
 }: SearchResultsPanelProps) {
   const results = data?.results ?? [];
   const meta = data?.meta;
+  const citationIndexById = new Map<string, number>();
+  const synthesisSources = data?.synthesis?.sources ?? [];
+  synthesisSources.forEach((id, idx) => citationIndexById.set(id, idx + 1));
+  const diagnostic = data ? getRetrievalDiagnostic(data.meta.provider_reports) : null;
+  const hasProviderIssue = diagnostic?.severity !== "ok";
 
   return (
     <div className="border-b border-white/10 xl:border-r xl:border-b-0">
       <div className="flex items-center justify-between px-5 py-4 text-sm text-slate-400 sm:px-6">
         <span>
           {isLoading
-            ? "Searching arXiv..."
+            ? "Searching live providers..."
             : meta
               ? `${meta.result_count} results from ${meta.provider_count} source${meta.provider_count === 1 ? "" : "s"}`
               : "Use the search bar above to start"}
@@ -36,9 +63,12 @@ export function SearchResultsPanel({
 
       <div className="space-y-3 px-3 pb-3 sm:px-4 sm:pb-4">
         {isLoading ? <SearchResultsSkeleton /> : null}
+        {!isLoading && !errorMessage && diagnostic ? (
+          <RetrievalStatusBanner diagnostic={diagnostic} onRetry={onRetry} />
+        ) : null}
         {!isLoading && errorMessage ? (
           <SearchMessageCard
-            title="Couldn’t load search results"
+            title="Could not load search results"
             body={errorMessage}
             actionLabel="Try again"
             onAction={onRetry}
@@ -52,15 +82,75 @@ export function SearchResultsPanel({
         ) : null}
         {!isLoading && !errorMessage && data && results.length === 0 ? (
           <SearchMessageCard
-            title="No papers matched this query"
-            body="Try a broader phrase, remove constraints, or search a related topic."
+            title={hasProviderIssue ? "Retrieval degraded" : "No papers matched this query"}
+            body={
+              hasProviderIssue
+                ? diagnostic?.body ?? "One or more providers could not return results."
+                : "Try a broader phrase, remove constraints, or search a related topic."
+            }
+            actionLabel={hasProviderIssue ? "Try again" : undefined}
+            onAction={hasProviderIssue ? onRetry : undefined}
           />
         ) : null}
         {!isLoading && !errorMessage
           ? results.map((paper, index) => (
-              <SearchResultCard key={paper.paper_id} paper={paper} index={index} />
+              <SearchResultCard
+                key={paper.paper_id}
+                paper={paper}
+                index={index}
+                citationIndex={citationIndexById.get(paper.paper_id)}
+              />
             ))
           : null}
+      </div>
+    </div>
+  );
+}
+
+function RetrievalStatusBanner({
+  diagnostic,
+  onRetry,
+}: {
+  diagnostic: RetrievalDiagnostic;
+  onRetry: () => void;
+}) {
+  if (diagnostic.severity === "ok") {
+    return (
+      <div className="flex flex-wrap items-center gap-2 rounded-2xl border border-white/10 bg-white/[0.025] px-4 py-3 text-xs text-slate-400">
+        <Gauge className="size-4 text-teal-200" />
+        <span>{diagnostic.label}</span>
+      </div>
+    );
+  }
+
+  const tone =
+    diagnostic.severity === "partial"
+      ? "border-amber-300/20 bg-amber-300/8 text-amber-100"
+      : "border-rose-300/20 bg-rose-300/8 text-rose-100";
+  const Icon = diagnostic.icon === "timeout" ? Clock : AlertTriangle;
+
+  return (
+    <div className={`rounded-2xl border px-4 py-3 ${tone}`}>
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex min-w-0 items-start gap-3">
+          <Icon className="mt-0.5 size-4 shrink-0" />
+          <div className="min-w-0">
+            <div className="text-sm font-medium">{diagnostic.title}</div>
+            <p className="mt-1 text-xs leading-5 opacity-80">{diagnostic.body}</p>
+          </div>
+        </div>
+        {diagnostic.retryable ? (
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            onClick={onRetry}
+            className="w-fit shrink-0 rounded-xl border-white/15 bg-white/[0.04] text-current hover:bg-white/[0.08]"
+          >
+            <RefreshCw className="size-3.5" />
+            Retry
+          </Button>
+        ) : null}
       </div>
     </div>
   );
@@ -69,11 +159,13 @@ export function SearchResultsPanel({
 function SearchResultCard({
   paper,
   index,
+  citationIndex,
 }: {
   paper: SearchResultItem;
   index: number;
+  citationIndex?: number | null;
 }) {
-  const metadata = [paper.year, paper.venue].filter(Boolean).join(" · ");
+  const metadata = [paper.year, paper.venue].filter(Boolean).join(" - ");
 
   return (
     <article className="rounded-[1.5rem] border border-white/10 bg-[linear-gradient(180deg,rgba(6,18,28,0.92)_0%,rgba(9,24,35,0.96)_100%)] p-4">
@@ -92,8 +184,8 @@ function SearchResultCard({
 
         <div className="min-w-0 flex-1">
           <div className="flex flex-wrap items-start justify-between gap-3">
-            <div className="space-y-2">
-              <div className="flex flex-wrap items-center gap-2">
+              <div className="space-y-2">
+                <div className="flex flex-wrap items-center gap-2">
                 <Badge
                   variant="outline"
                   className="rounded-full border-white/10 bg-white/[0.04] text-slate-200"
@@ -104,9 +196,16 @@ function SearchResultCard({
                   <span className="text-sm text-slate-500">{metadata}</span>
                 ) : null}
               </div>
-              <h2 className="text-2xl font-semibold leading-tight text-white">
-                {paper.title}
-              </h2>
+              <div className="flex items-center gap-3">
+                <h2 className="text-2xl font-semibold leading-tight text-white">
+                  {paper.title}
+                </h2>
+                {citationIndex ? (
+                  <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-gradient-to-br from-teal-400 to-teal-600 text-xs font-bold text-white shadow-sm">
+                    {citationIndex}
+                  </div>
+                ) : null}
+              </div>
             </div>
             <Button
               variant="ghost"
@@ -232,4 +331,85 @@ function formatScore(score?: number | null) {
   }
 
   return (score * 10).toFixed(1);
+}
+
+function getRetrievalDiagnostic(reports: ProviderReport[]): RetrievalDiagnostic | null {
+  if (reports.length === 0) {
+    return null;
+  }
+
+  const failedReports = reports.filter((report) => report.status === "error");
+  const partialReports = reports.filter((report) => report.status === "partial");
+  const issueReports = [...partialReports, ...failedReports];
+
+  if (issueReports.length === 0) {
+    return {
+      severity: "ok",
+      title: "Retrieval healthy",
+      body: "",
+      label: buildHealthyLabel(reports),
+      retryable: false,
+      icon: "health",
+    };
+  }
+
+  const errors = issueReports.flatMap((report) => report.errors);
+  const providerNames = issueReports.map(formatProviderName);
+  const hasRateLimit = errors.some(isRateLimitError);
+  const hasTimeout = errors.some(
+    (error) => error.code === "timeout" || error.code === "budget_exceeded",
+  );
+  const retryable = errors.some((error) => error.retryable) || hasRateLimit || hasTimeout;
+  const severity = failedReports.length === reports.length ? "error" : "partial";
+
+  if (hasRateLimit) {
+    return {
+      severity,
+      title: `${providerNames.join(", ")} temporarily rate limited`,
+      body: severity === "partial" ? "Partial results returned. Retry in a few seconds." : "Retry in a few seconds.",
+      label: "Rate limited",
+      retryable,
+      icon: "rate_limit",
+    };
+  }
+
+  if (hasTimeout) {
+    return {
+      severity,
+      title: `${providerNames.join(", ")} timed out`,
+      body: severity === "partial" ? "Partial results returned before the timeout." : "Try again or narrow the query.",
+      label: "Timeout",
+      retryable,
+      icon: "timeout",
+    };
+  }
+
+  return {
+    severity,
+    title: severity === "partial" ? "Partial results returned" : "Retrieval degraded",
+    body: `${providerNames.join(", ")} could not complete retrieval.`,
+    label: "Degraded",
+    retryable,
+    icon: "health",
+  };
+}
+
+function buildHealthyLabel(reports: ProviderReport[]) {
+  const providerLabel = reports.map(formatProviderName).join(", ");
+  const slowestLatency = Math.max(...reports.map((report) => report.latency_ms));
+  return `${providerLabel} healthy - ${Math.round(slowestLatency)}ms`;
+}
+
+function formatProviderName(report: ProviderReport) {
+  if (report.source === "arxiv") {
+    return "arXiv";
+  }
+  if (report.source === "semantic_scholar") {
+    return "Semantic Scholar";
+  }
+  return report.source;
+}
+
+function isRateLimitError(error: ProviderError) {
+  return error.code === "rate_limited" || error.message.includes("429");
 }
