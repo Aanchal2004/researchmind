@@ -51,6 +51,7 @@ class SearchSynthesis(BaseModel):
     summary: str
     highlights: list[str] = Field(default_factory=list)
     sources: list[str] = Field(default_factory=list)
+    model: str | None = None  # e.g. "llama3", "gemini-2.0-flash", or None for extractive
 
 
 class SearchMeta(BaseModel):

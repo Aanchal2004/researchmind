@@ -1,3 +1,7 @@
+"use client";
+
+import { useEffect, useMemo, useState } from "react";
+import Link from "next/link";
 import {
   ArrowUpRight,
   BellRing,
@@ -9,12 +13,10 @@ import {
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import {
-  collections,
-  dashboardMetrics,
-  recentPapers,
-  topicAlerts,
-} from "@/lib/mock-data";
+import { SavedLibraryPanel } from "@/components/library/saved-library-panel";
+import { collections, topicAlerts } from "@/lib/mock-data";
+import { loadSavedPapers, subscribeSavedPapers } from "@/lib/saved-papers";
+import type { SearchResultItem } from "@/lib/api/types";
 import { cn } from "@/lib/utils";
 
 const metricAccent = {
@@ -24,6 +26,44 @@ const metricAccent = {
 } as const;
 
 export function DashboardHome() {
+  const [savedPapers, setSavedPapers] = useState<SearchResultItem[]>([]);
+
+  useEffect(() => {
+    setSavedPapers(loadSavedPapers());
+    return subscribeSavedPapers(() => {
+      setSavedPapers(loadSavedPapers());
+    });
+  }, []);
+
+  const metrics = useMemo(
+    () => [
+      {
+        label: "Papers saved",
+        value: String(savedPapers.length),
+        change:
+          savedPapers.length > 0
+            ? "Synced from this browser"
+            : "Save papers from search",
+        tone: "teal" as const,
+      },
+      {
+        label: "Collections",
+        value: "6",
+        change: "+1 this month",
+        tone: "violet" as const,
+      },
+      {
+        label: "Alerts",
+        value: "3",
+        change: "3 new papers",
+        tone: "amber" as const,
+      },
+    ],
+    [savedPapers.length],
+  );
+
+  const recentSavedPapers = savedPapers.slice(0, 4);
+
   return (
     <div className="space-y-4">
       <section className="panel p-6 sm:p-8">
@@ -39,7 +79,7 @@ export function DashboardHome() {
           </div>
           <div className="w-full max-w-xl">
             <div className="grid gap-3 sm:grid-cols-3">
-              {dashboardMetrics.map((metric) => (
+              {metrics.map((metric) => (
                 <div
                   key={metric.label}
                   className={cn(
@@ -61,63 +101,98 @@ export function DashboardHome() {
         </div>
       </section>
 
-      <section id="library" className="panel p-5 sm:p-6">
+      <SavedLibraryPanel />
+
+      <section className="panel p-5 sm:p-6">
         <div className="mb-5 flex items-center justify-between">
           <div>
             <h2 className="text-xl font-semibold text-white">Recent papers</h2>
             <p className="mt-1 text-sm text-slate-400">
-              The latest additions across your reading flow.
+              Your most recently saved papers from search.
             </p>
           </div>
-          <Button variant="ghost" className="text-slate-300 hover:bg-white/6 hover:text-white">
-            View all
-            <ArrowUpRight className="size-4" />
+          <Button
+            asChild
+            variant="ghost"
+            className="text-slate-300 hover:bg-white/6 hover:text-white"
+          >
+            <Link href="/dashboard#library">
+              View all
+              <ArrowUpRight className="size-4" />
+            </Link>
           </Button>
         </div>
-        <div className="grid gap-4 xl:grid-cols-4 md:grid-cols-2">
-          {recentPapers.map((paper) => (
-            <article
-              key={paper.title}
-              className="rounded-[1.5rem] border border-white/8 bg-white/[0.03] p-5"
+
+        {recentSavedPapers.length === 0 ? (
+          <div className="rounded-[1.5rem] border border-white/10 bg-white/[0.03] p-8 text-center">
+            <h3 className="text-lg font-semibold text-white">No recent saves yet</h3>
+            <p className="mt-2 text-sm leading-6 text-slate-400">
+              Save papers from search results and they will appear here automatically.
+            </p>
+            <Button
+              asChild
+              variant="outline"
+              className="mt-6 rounded-xl border-white/10 bg-white/[0.04] text-slate-200 hover:bg-white/[0.08]"
             >
-              <div className="flex items-start justify-between gap-3">
-                <Badge
-                  variant="outline"
-                  className="rounded-full border-white/10 bg-white/[0.04] text-slate-200"
-                >
-                  {paper.source}
-                </Badge>
-                <Button
-                  variant="ghost"
-                  size="icon-sm"
-                  className="text-slate-400 hover:bg-white/6 hover:text-white"
-                >
-                  <MoreHorizontal className="size-4" />
-                  <span className="sr-only">Paper options</span>
-                </Button>
-              </div>
-              <h3 className="mt-5 text-lg font-semibold leading-7 text-white">
-                {paper.title}
-              </h3>
-              <p className="mt-3 text-sm leading-6 text-slate-300/74">
-                {paper.authors}
-              </p>
-              <div className="mt-3 text-sm text-slate-500">
-                {paper.year} · {paper.venue}
-              </div>
-              <div className="mt-5 flex items-center gap-4 text-sm text-slate-300">
-                <span className="inline-flex items-center gap-2">
-                  <Bookmark className="size-4" />
-                  View
-                </span>
-                <span className="inline-flex items-center gap-2">
-                  <FolderOpenDot className="size-4" />
-                  Add to collection
-                </span>
-              </div>
-            </article>
-          ))}
-        </div>
+              <Link href="/search">Go to search</Link>
+            </Button>
+          </div>
+        ) : (
+          <div className="grid gap-4 xl:grid-cols-4 md:grid-cols-2">
+            {recentSavedPapers.map((paper) => (
+              <article
+                key={paper.paper_id}
+                className="rounded-[1.5rem] border border-white/8 bg-white/[0.03] p-5"
+              >
+                <div className="flex items-start justify-between gap-3">
+                  <Badge
+                    variant="outline"
+                    className="rounded-full border-white/10 bg-white/[0.04] text-slate-200"
+                  >
+                    {paper.source}
+                  </Badge>
+                  <Button
+                    variant="ghost"
+                    size="icon-sm"
+                    className="text-slate-400 hover:bg-white/6 hover:text-white"
+                  >
+                    <MoreHorizontal className="size-4" />
+                    <span className="sr-only">Paper options</span>
+                  </Button>
+                </div>
+                <h3 className="mt-5 text-lg font-semibold leading-7 text-white">
+                  {paper.title}
+                </h3>
+                <p className="mt-3 text-sm leading-6 text-slate-300/74">
+                  {paper.authors.join(", ")}
+                </p>
+                <div className="mt-3 text-sm text-slate-500">
+                  {[paper.year, paper.venue].filter(Boolean).join(" · ")}
+                </div>
+                <div className="mt-5 flex items-center gap-4 text-sm text-slate-300">
+                  <Link
+                    href={`/search?q=${encodeURIComponent(paper.title)}`}
+                    className="inline-flex items-center gap-2 hover:text-white"
+                  >
+                    <Bookmark className="size-4" />
+                    Search similar
+                  </Link>
+                  {paper.url ? (
+                    <a
+                      href={paper.url}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="inline-flex items-center gap-2 hover:text-white"
+                    >
+                      <FolderOpenDot className="size-4" />
+                      Open paper
+                    </a>
+                  ) : null}
+                </div>
+              </article>
+            ))}
+          </div>
+        )}
       </section>
 
       <section id="collections" className="panel p-5 sm:p-6">

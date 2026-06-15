@@ -62,7 +62,7 @@ export function WorkspaceHeader() {
             variant="outline"
             className="rounded-xl border-white/10 bg-white/[0.04] text-slate-100 hover:bg-white/[0.08]"
           >
-            <Link href="/dashboard#library">
+            <Link href="/saved">
               <Bookmark className="size-4" />
               My library
             </Link>
@@ -72,7 +72,7 @@ export function WorkspaceHeader() {
             variant="outline"
             className="rounded-xl border-white/10 bg-white/[0.04] text-slate-100 hover:bg-white/[0.08]"
           >
-            <Link href="/dashboard#alerts">
+            <Link href="/alerts">
               <Bell className="size-4" />
               Alerts
             </Link>

@@ -17,12 +17,15 @@ import type {
   SearchResponse,
   SearchResultItem,
 } from "@/lib/api/types";
+import { formatSourceLabel } from "@/lib/search-filters";
 
 type SearchResultsPanelProps = {
   data: SearchResponse | null;
   isLoading: boolean;
   errorMessage: string | null;
   onRetry: () => void;
+  savedPaperIds?: Set<string>;
+  onToggleSavedPaper?: (paper: SearchResultItem) => void;
 };
 
 type RetrievalDiagnostic = {
@@ -39,6 +42,8 @@ export function SearchResultsPanel({
   isLoading,
   errorMessage,
   onRetry,
+  savedPaperIds,
+  onToggleSavedPaper,
 }: SearchResultsPanelProps) {
   const results = data?.results ?? [];
   const meta = data?.meta;
@@ -99,6 +104,8 @@ export function SearchResultsPanel({
                 paper={paper}
                 index={index}
                 citationIndex={citationIndexById.get(paper.paper_id)}
+                isSaved={savedPaperIds?.has(paper.paper_id) ?? false}
+                onToggleSavedPaper={onToggleSavedPaper}
               />
             ))
           : null}
@@ -160,10 +167,14 @@ function SearchResultCard({
   paper,
   index,
   citationIndex,
+  isSaved,
+  onToggleSavedPaper,
 }: {
   paper: SearchResultItem;
   index: number;
   citationIndex?: number | null;
+  isSaved?: boolean;
+  onToggleSavedPaper?: (paper: SearchResultItem) => void;
 }) {
   const metadata = [paper.year, paper.venue].filter(Boolean).join(" - ");
 
@@ -192,6 +203,22 @@ function SearchResultCard({
                 >
                   {paper.source}
                 </Badge>
+                {paper.provider_sources.length > 1 ? (
+                  <Badge
+                    variant="outline"
+                    className="rounded-full border-teal-300/20 bg-teal-400/10 text-teal-100"
+                  >
+                    Merged: {paper.provider_sources.map(formatSourceLabel).join(" + ")}
+                  </Badge>
+                ) : paper.provider_sources.length === 1 &&
+                  paper.provider_sources[0] !== paper.source ? (
+                  <Badge
+                    variant="outline"
+                    className="rounded-full border-white/10 bg-white/[0.04] text-slate-300"
+                  >
+                    {formatSourceLabel(paper.provider_sources[0])}
+                  </Badge>
+                ) : null}
                 {metadata ? (
                   <span className="text-sm text-slate-500">{metadata}</span>
                 ) : null}
@@ -210,10 +237,15 @@ function SearchResultCard({
             <Button
               variant="ghost"
               size="icon-sm"
-              className="text-slate-400 hover:bg-white/6 hover:text-white"
+              className={`${
+                isSaved ? "text-teal-200 hover:bg-teal-400/10" : "text-slate-400 hover:bg-white/6 hover:text-white"
+              }`}
+              onClick={() => onToggleSavedPaper?.(paper)}
             >
               <Bookmark className="size-4" />
-              <span className="sr-only">Save paper</span>
+              <span className="sr-only">
+                {isSaved ? "Unsave paper" : "Save paper"}
+              </span>
             </Button>
           </div>
 

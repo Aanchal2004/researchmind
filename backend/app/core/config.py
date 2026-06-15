@@ -40,7 +40,7 @@ class Settings(BaseSettings):
     arxiv_max_concurrent_requests: int = 1
     arxiv_sort_by: str = "relevance"
     arxiv_sort_order: str = "descending"
-    semantic_scholar_enabled: bool = False
+    semantic_scholar_enabled: bool = True
     semantic_scholar_api_key: str | None = None
     semantic_scholar_base_url: str = "https://api.semanticscholar.org/graph/v1/paper/search"
     semantic_scholar_max_results_per_request: int = 10
@@ -53,7 +53,49 @@ class Settings(BaseSettings):
     synthesis_enabled: bool = True
     synthesis_max_papers: int = 5
     synthesis_max_abstract_chars: int = 1200
+    # LLM synthesis — set provider to "gemini", "ollama", or "disabled"
+    llm_provider: str = "disabled"
+    llm_gemini_api_key: str | None = None
+    llm_gemini_model: str = "gemini-2.0-flash"
+    llm_temperature: float = 0.2
+    llm_max_output_tokens: int = 1024
+    llm_request_timeout_seconds: float = 30.0
+    llm_synthesis_cache_ttl_seconds: float = 300.0
+    # Ollama (local) settings
+    llm_ollama_base_url: str = "http://localhost:11434"
+    llm_ollama_model: str = "llama3"
     http_timeout_seconds: float = 10.0
+    # Supabase
+    supabase_url: str = ""
+    supabase_anon_key: str = ""
+    supabase_service_role_key: str = ""
+    supabase_jwt_secret: str = ""  # Settings → API → JWT Settings → JWT Secret
+    # PubMed (NCBI E-utilities — free, no key required; key raises rate limit)
+    pubmed_enabled: bool = True
+    pubmed_api_key: str | None = None
+    pubmed_max_results_per_request: int = 10
+    pubmed_retry_attempts: int = 2
+    pubmed_retry_backoff_seconds: float = 1.0
+    pubmed_retry_jitter_seconds: float = 0.5
+    pubmed_request_timeout_seconds: float = 12.0
+    pubmed_total_budget_seconds: float = 14.0
+    pubmed_min_interval_seconds: float = 0.34  # ~3 req/s without key; 10/s with key
+    # Crossref (free, polite pool via mailto)
+    crossref_enabled: bool = True
+    crossref_mailto: str | None = None
+    crossref_max_results_per_request: int = 10
+    crossref_retry_attempts: int = 2
+    crossref_retry_backoff_seconds: float = 1.0
+    crossref_retry_jitter_seconds: float = 0.5
+    crossref_request_timeout_seconds: float = 12.0
+    crossref_total_budget_seconds: float = 14.0
+    crossref_min_interval_seconds: float = 0.5
+    # Unpaywall enricher (best-effort PDF resolution by DOI)
+    unpaywall_enabled: bool = False
+    unpaywall_email: str = "researchmind@example.com"
+    unpaywall_request_timeout_seconds: float = 5.0
+    unpaywall_min_interval_seconds: float = 0.2
+    unpaywall_max_concurrent: int = 4
 
     model_config = SettingsConfigDict(
         env_file=".env",

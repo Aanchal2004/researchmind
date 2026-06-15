@@ -1,14 +1,21 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { ListFilter, Sparkles } from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
+import Link from "next/link";
+import { Sparkles } from "lucide-react";
 import { useSearchParams } from "next/navigation";
 
+import { SearchFiltersSheet } from "@/components/search/search-filters-sheet";
 import { SearchResultsPanel } from "@/components/search/search-results-panel";
 import { SearchSynthesisPanel } from "@/components/search/search-synthesis-panel";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { searchPapers } from "@/lib/api/client";
+import { searchPapers, fetchSynthesis } from "@/lib/api/client";
+import { persistLastSearchQuery } from "@/lib/last-search";
+import { persistLastSearchMeta } from "@/lib/last-search-meta";
+import { buildFilterBadges, parseSearchFilters } from "@/lib/search-filters";
+import { useSavedPapers } from "@/lib/hooks/use-saved-papers";
+import { useSearchHistory } from "@/lib/hooks/use-search-history";
 import type { SearchRequest, SearchResponse } from "@/lib/api/types";
 
 const DEFAULT_LIMIT = 8;
@@ -18,11 +25,18 @@ export function SearchPageShell() {
   const query = searchParams.get("q")?.trim() ?? "";
   const limitParam = Number(searchParams.get("limit"));
   const limit = Number.isFinite(limitParam) && limitParam > 0 ? limitParam : DEFAULT_LIMIT;
+  const filters = useMemo(() => parseSearchFilters(searchParams), [searchParams]);
+  const filtersKey = useMemo(() => JSON.stringify(filters), [filters]);
 
   const [data, setData] = useState<SearchResponse | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [reloadKey, setReloadKey] = useState(0);
+  // Tracks whether we are still waiting on background synthesis.
+  const [synthesisPending, setSynthesisPending] = useState(false);
+
+  const { savedPaperIds, togglePaper: toggleSavedPaper } = useSavedPapers();
+  const { addEntry: addHistoryEntry } = useSearchHistory();
 
   useEffect(() => {
     if (!query) {
@@ -36,25 +50,61 @@ export function SearchPageShell() {
     const payload: SearchRequest = {
       query,
       limit,
-      filters: {
-        sources: ["arxiv"],
-        open_access_only: true,
-      },
+      filters,
     };
 
     async function runSearch() {
       setIsLoading(true);
+      setSynthesisPending(false);
       setErrorMessage(null);
 
       try {
         const response = await searchPapers(payload, controller.signal);
         setData(response);
+        persistLastSearchQuery(query);
+        persistLastSearchMeta(response.meta);
+        addHistoryEntry(query, {
+          resultCount: response.results.length,
+          sourcesQueried: response.meta.sources_queried,
+        });
+
+        // If synthesis is still being generated, poll until it arrives.
+        if (response.synthesis.status === "pending" && response.meta.query_id) {
+          setSynthesisPending(true);
+          const queryId = response.meta.query_id;
+
+          const pollInterval = setInterval(async () => {
+            if (controller.signal.aborted) {
+              clearInterval(pollInterval);
+              return;
+            }
+            try {
+              const synthesis = await fetchSynthesis(queryId, controller.signal);
+              if (synthesis && synthesis.status !== "pending") {
+                clearInterval(pollInterval);
+                setSynthesisPending(false);
+                setData((prev) =>
+                  prev ? { ...prev, synthesis } : prev,
+                );
+              }
+            } catch {
+              // ignore transient poll errors — keep retrying
+            }
+          }, 1500);
+
+          // Clean up polling if this effect reruns (new search).
+          controller.signal.addEventListener("abort", () => {
+            clearInterval(pollInterval);
+            setSynthesisPending(false);
+          });
+        }
       } catch (error) {
         if (controller.signal.aborted) {
           return;
         }
 
         setData(null);
+        setSynthesisPending(false);
         setErrorMessage(
           error instanceof Error
             ? error.message
@@ -70,12 +120,10 @@ export function SearchPageShell() {
     void runSearch();
 
     return () => controller.abort();
-  }, [limit, query, reloadKey]);
+  }, [filters, filtersKey, limit, query, reloadKey]);
 
   const filterBadges = [
-    "Source: arXiv",
-    "Open access only",
-    `Limit: ${limit}`,
+    ...buildFilterBadges(filters, limit),
     data ? `Mode: ${data.meta.mode}` : "Live backend",
   ];
 
@@ -96,28 +144,24 @@ export function SearchPageShell() {
             </div>
             <div className="flex flex-wrap gap-2">
               <Button
+                asChild
                 variant="outline"
                 className="rounded-xl border-white/10 bg-white/[0.04] text-slate-100 hover:bg-white/[0.08]"
               >
-                Save search
+                <Link href="/search/history">Search history</Link>
               </Button>
               <Button
+                asChild
                 variant="outline"
                 className="rounded-xl border-white/10 bg-white/[0.04] text-slate-100 hover:bg-white/[0.08]"
               >
-                Alerts
+                <Link href="/alerts">Alerts</Link>
               </Button>
             </div>
           </div>
 
           <div className="mt-5 flex flex-wrap gap-2">
-            <Button
-              variant="ghost"
-              className="rounded-full border border-white/10 bg-white/[0.04] text-slate-200 hover:bg-white/[0.08]"
-            >
-              <ListFilter className="size-4" />
-              Filters
-            </Button>
+            <SearchFiltersSheet />
             {filterBadges.map((filter) => (
               <Badge
                 key={filter}
@@ -136,10 +180,13 @@ export function SearchPageShell() {
             isLoading={isLoading}
             errorMessage={errorMessage}
             onRetry={() => setReloadKey((current) => current + 1)}
+            savedPaperIds={savedPaperIds}
+            onToggleSavedPaper={toggleSavedPaper}
           />
           <SearchSynthesisPanel
             data={data}
             isLoading={isLoading}
+            synthesisPending={synthesisPending}
             errorMessage={errorMessage}
           />
         </div>

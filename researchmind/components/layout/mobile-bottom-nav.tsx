@@ -2,15 +2,15 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { BellRing, LibraryBig, Search, UserCircle2 } from "lucide-react";
+import { BellRing, LibraryBig, Search, Settings2 } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 
 const mobileItems = [
   { href: "/search", label: "Search", icon: Search },
-  { href: "/dashboard", label: "Library", icon: LibraryBig },
-  { href: "/dashboard#alerts", label: "Alerts", icon: BellRing, badge: "3" },
-  { href: "/dashboard#profile", label: "Profile", icon: UserCircle2 },
+  { href: "/saved", label: "Library", icon: LibraryBig },
+  { href: "/alerts", label: "Alerts", icon: BellRing, badge: "3" },
+  { href: "/settings", label: "Settings", icon: Settings2 },
 ];
 
 export function MobileBottomNav() {
@@ -26,8 +26,8 @@ export function MobileBottomNav() {
           const Icon = item.icon;
           const isActive =
             item.href === "/search"
-              ? pathname.startsWith("/search")
-              : pathname.startsWith("/dashboard");
+              ? pathname.startsWith("/search") && !pathname.startsWith("/search/history")
+              : pathname.startsWith(item.href);
 
           return (
             <Link

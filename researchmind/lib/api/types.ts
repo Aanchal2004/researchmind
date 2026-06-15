@@ -35,6 +35,7 @@ export type SearchSynthesis = {
   summary: string;
   highlights: string[];
   sources: string[];
+  model?: string | null;
 };
 
 export type SearchMeta = {
